@@ -6,4 +6,4 @@ set -e
 # Install Python dependencies
 pip install -r requirements.txt
 
-python api/app.py
+python app.py
