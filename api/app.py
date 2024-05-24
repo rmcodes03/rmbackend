@@ -338,7 +338,7 @@ def add_leave():
 
     new_leave = {
         'name': name,
-        'empid': empid,
+        'employeeId': empid,
         'reason': reason,
         'numberOfDays': numberOfDays,
         'fromDate': fromDate,
@@ -381,32 +381,40 @@ def add_event():
     db.events.insert_one(new_event)
     return jsonify({'message': 'Event added successfully'}), 201
 
-@app.route('/auth/update_event/<event_id>', methods=['PUT'])
-def update_event(event_id):
+@app.route('/auth/update_event/<id>', methods=['POST'])
+def update_event(id):
     data = request.json
-    title = data.get('title')
-    start = data.get('start')
-    end = data.get('end')
+    new_title = data.get('title')
 
-    event = db.events.find_one({'_id': ObjectId(event_id)})
-    if not event:
-        return jsonify({'error': 'Event not found'}), 404
+    if not new_title:
+        return jsonify({"error": "New title is required"}), 400
 
-    event['title'] = title
-    event['start'] = start
-    event['end'] = end
+    try:
+        result = db.events.update_one({'_id': ObjectId(id)}, {'$set': {'title': new_title}})
+        if result.modified_count == 1:
+            return jsonify({"message": "Event title updated successfully"}), 200
+        else:
+            return jsonify({"error": "Event not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    db.events.update_one({'_id': ObjectId(event_id)}, {'$set': event})
-    return jsonify({'message': 'Event updated successfully'}), 200
+@app.route('/auth/delete_event', methods=['POST'])
+def delete_event():
+    data = request.json
+    event_id = data.get('id')
 
-@app.route('/auth/delete_event/<event_id>', methods=['DELETE'])
-def delete_event(event_id):
-    result = db.events.delete_one({'_id': ObjectId(event_id)})
-    if result.deleted_count == 0:
-        return jsonify({'error': 'Event not found'}), 404
+    if not event_id:
+        return jsonify({"error": "Event ID is required"}), 400
 
-    return jsonify({'message': 'Event deleted successfully'}), 200
-
+    try:
+        result = db.events.delete_one({'_id': ObjectId(event_id)})
+        if result.deleted_count == 1:
+            return jsonify({"message": "Event deleted successfully"}), 200
+        else:
+            return jsonify({"error": "Event not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/auth/get_events', methods=['GET'])
 def get_events():
     try:
