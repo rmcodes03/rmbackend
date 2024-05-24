@@ -56,7 +56,7 @@ class EmployeeDataForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired()])
     empid = StringField('Employee ID', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = StringField('Password', validators=[DataRequired()])
     salary = DecimalField('Salary', validators=[DataRequired()])
     category = SelectField('Category', choices=[('1', 'HR'), ('2', 'TECH')], validators=[DataRequired()])
     profile = FileField('Profile Image')
@@ -118,7 +118,7 @@ class AdminDataView(ModelView):
     form = AdminDataForm
 
 class EmployeeDataView(ModelView):
-    column_list = ('name', 'email', 'empid', 'salary', 'category', 'profile') 
+    column_list = ('name', 'email', 'empid', 'password', 'salary', 'category', 'profile') 
     form = EmployeeDataForm
 
 class LeavesView(ModelView):
