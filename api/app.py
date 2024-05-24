@@ -246,7 +246,7 @@ def login():
         return jsonify({'loginStatus': True}), 200
     else:
         return jsonify({'loginStatus': False, 'Error': 'Invalid credentials'}), 401
-
+'''
 @app.route('/auth/employee', methods=['GET'])
 def get_employee_data():
     print("In authemployee: "+session['logged_in'])
@@ -263,6 +263,26 @@ def get_employee_data():
         'email': user['email'],
         'password': user['password'],
         'profileImage': base64.b64encode(user['profile_image']).decode('utf-8') if user['profile_image'] else None
+    }), 200
+'''
+@app.route('/auth/employee', methods=['GET'])
+def get_employee_data():
+    if 'logged_in' not in session or not session.get('logged_in'):
+        return jsonify({'error': 'User not logged in'}), 401
+
+    empid = session.get('empid')
+    if not empid:
+        return jsonify({'error': 'Employee ID not found in session'}), 401
+
+    user = db.emp_data.find_one({'empid': empid})
+    if not user:
+        return jsonify({'error': 'Employee not found'}), 404
+
+    return jsonify({
+        'name': user['name'],
+        'email': user['email'],
+        'password': user['password'],
+        'profileImage': base64.b64encode(user.get('profile_image', b'')).decode('utf-8')
     }), 200
 
 @app.route('/auth/employees', methods=['GET'])
