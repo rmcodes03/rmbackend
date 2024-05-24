@@ -56,7 +56,7 @@ class EmployeeDataForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired()])
     empid = StringField('Employee ID', validators=[DataRequired()])
-    password = StringField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
     salary = DecimalField('Salary', validators=[DataRequired()])
     category = SelectField('Category', choices=[('1', 'HR'), ('2', 'TECH')], validators=[DataRequired()])
     profile = FileField('Profile Image')
@@ -118,7 +118,7 @@ class AdminDataView(ModelView):
     form = AdminDataForm
 
 class EmployeeDataView(ModelView):
-    column_list = ('name', 'email', 'empid', 'password', 'salary', 'category', 'profile') 
+    column_list = ('name', 'email', 'empid', 'salary', 'category', 'profile') 
     form = EmployeeDataForm
 
 class LeavesView(ModelView):
@@ -241,15 +241,13 @@ def login():
     if user and user['password'] == password:
         print('Login successful')
         session['logged_in'] = True
-        print(session['logged_in'])
         session['empid'] = empid
         return jsonify({'loginStatus': True}), 200
     else:
         return jsonify({'loginStatus': False, 'Error': 'Invalid credentials'}), 401
-'''
+
 @app.route('/auth/employee', methods=['GET'])
 def get_employee_data():
-    print("In authemployee: "+session['logged_in'])
     if 'logged_in' not in session or not session['logged_in']:
         return jsonify({'error': 'Not logged in'}), 401
 
@@ -263,26 +261,6 @@ def get_employee_data():
         'email': user['email'],
         'password': user['password'],
         'profileImage': base64.b64encode(user['profile_image']).decode('utf-8') if user['profile_image'] else None
-    }), 200
-'''
-@app.route('/auth/employee', methods=['GET'])
-def get_employee_data():
-    if 'logged_in' not in session or not session.get('logged_in'):
-        return jsonify({'error': 'User not logged in'}), 401
-
-    empid = session.get('empid')
-    if not empid:
-        return jsonify({'error': 'Employee ID not found in session'}), 401
-
-    user = db.emp_data.find_one({'empid': empid})
-    if not user:
-        return jsonify({'error': 'Employee not found'}), 404
-
-    return jsonify({
-        'name': user['name'],
-        'email': user['email'],
-        'password': user['password'],
-        'profileImage': base64.b64encode(user.get('profile_image', b'')).decode('utf-8')
     }), 200
 
 @app.route('/auth/employees', methods=['GET'])
@@ -360,7 +338,7 @@ def add_leave():
 
     new_leave = {
         'name': name,
-        'employeeId': empid,
+        'empid': empid,
         'reason': reason,
         'numberOfDays': numberOfDays,
         'fromDate': fromDate,
@@ -403,22 +381,23 @@ def add_event():
     db.events.insert_one(new_event)
     return jsonify({'message': 'Event added successfully'}), 201
 
-@app.route('/auth/update_event/<id>', methods=['POST'])
-def update_event(id):
+@app.route('/auth/update_event/<event_id>', methods=['PUT'])
+def update_event(event_id):
     data = request.json
-    new_title = data.get('title')
+    title = data.get('title')
+    start = data.get('start')
+    end = data.get('end')
 
-    if not new_title:
-        return jsonify({"error": "New title is required"}), 400
+    event = db.events.find_one({'_id': ObjectId(event_id)})
+    if not event:
+        return jsonify({'error': 'Event not found'}), 404
 
-    try:
-        result = db.events.update_one({'_id': ObjectId(id)}, {'$set': {'title': new_title}})
-        if result.modified_count == 1:
-            return jsonify({"message": "Event title updated successfully"}), 200
-        else:
-            return jsonify({"error": "Event not found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    event['title'] = title
+    event['start'] = start
+    event['end'] = end
+
+    db.events.update_one({'_id': ObjectId(event_id)}, {'$set': event})
+    return jsonify({'message': 'Event updated successfully'}), 200
 
 @app.route('/auth/delete_event', methods=['POST'])
 def delete_event():
