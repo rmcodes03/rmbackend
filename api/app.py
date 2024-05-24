@@ -241,6 +241,7 @@ def login():
     if user and user['password'] == password:
         print('Login successful')
         session['logged_in'] = True
+        print(session['logged_in'])
         session['empid'] = empid
         return jsonify({'loginStatus': True}), 200
     else:
@@ -248,6 +249,7 @@ def login():
 
 @app.route('/auth/employee', methods=['GET'])
 def get_employee_data():
+    print("In authemployee: "+session['logged_in'])
     if 'logged_in' not in session or not session['logged_in']:
         return jsonify({'error': 'Not logged in'}), 401
 
