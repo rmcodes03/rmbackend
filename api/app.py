@@ -545,11 +545,13 @@ TimeTracker - Add Project To Databaase
 """
 @app.route('/auth/add_project_data', methods=['POST'])
 def add_project_data():
+    '''
     print(f'Session contents: {session}')
     if 'empid' not in session:
         return jsonify({'error': 'Not logged in'}), 401
-
-    empid = session['empid']
+    '''
+    #empid = session['empid']
+    empid = 'rm123'
     session['empid'] = empid
     session.modified = True
     print(f'Adding project data for empid: {empid}')
@@ -582,10 +584,12 @@ TimeTracker - Display worked project details
 """
 @app.route('/auth/get_employee_projects', methods=['GET'])
 def get_employee_projects():
+    '''
     if 'empid' not in session:
         return jsonify({'error': 'Not logged in'}), 401
-
-    empid = session['empid']
+    '''
+    #empid = session['empid']
+    empid = 'rm123'
     projects = db.projects.find({'empid': empid})
     project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'], 'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
 
