@@ -361,10 +361,12 @@ Profile Page - Show Employee Details
 """
 @app.route('/auth/employee', methods=['GET'])
 def get_employee_data():
+    '''
     if 'logged_in' not in session or not session['logged_in']:
         return jsonify({'error': 'Not logged in'}), 401
-
-    empid = session['empid']
+    '''
+    #empid = session['empid']
+    empid = 'rm123'
     user = db.emp_data.find_one({'empid': empid})
     if not user:
         return jsonify({'error': 'Employee not found'}), 404
