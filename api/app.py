@@ -361,12 +361,10 @@ Profile Page - Show Employee Details
 """
 @app.route('/auth/employee', methods=['GET'])
 def get_employee_data():
-    '''
     if 'logged_in' not in session or not session['logged_in']:
         return jsonify({'error': 'Not logged in'}), 401
-    '''
-    #empid = session['empid']
-    empid = 'rm123'
+
+    empid = session['empid']
     user = db.emp_data.find_one({'empid': empid})
     if not user:
         return jsonify({'error': 'Employee not found'}), 404
@@ -545,13 +543,11 @@ TimeTracker - Add Project To Databaase
 """
 @app.route('/auth/add_project_data', methods=['POST'])
 def add_project_data():
-    '''
     print(f'Session contents: {session}')
     if 'empid' not in session:
         return jsonify({'error': 'Not logged in'}), 401
-    '''
-    #empid = session['empid']
-    empid = 'rm123'
+
+    empid = session['empid']
     session['empid'] = empid
     session.modified = True
     print(f'Adding project data for empid: {empid}')
@@ -584,12 +580,10 @@ TimeTracker - Display worked project details
 """
 @app.route('/auth/get_employee_projects', methods=['GET'])
 def get_employee_projects():
-    '''
     if 'empid' not in session:
         return jsonify({'error': 'Not logged in'}), 401
-    '''
-    #empid = session['empid']
-    empid = 'rm123'
+    
+    empid = session['empid']
     projects = db.projects.find({'empid': empid})
     project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'], 'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
 
