@@ -541,6 +541,7 @@ def get_projects():
 """
 TimeTracker - Add Project To Databaase
 """
+'''
 @app.route('/auth/add_project_data', methods=['POST'])
 def add_project_data():
     print(f'Session contents: {session}')
@@ -574,7 +575,32 @@ def add_project_data():
         return jsonify({'message': 'Project data added successfully!', 'projectid': projectid}), 201
     else:
         return jsonify({'error': 'Failed to add project data.'}), 500
+'''
+@app.route('/auth/add_project_data', methods=['POST'])
+def add_project_data():
+    data = request.json
+    projectName = data.get('projectName')
+    task = data.get('task')  
+    tags = data.get('tags') 
+    timeElapsed = data.get('timeElapsed')
+    
+    # Generate projectid using ObjectId
+    projectid = str(ObjectId())
 
+    new_project = {
+        'projectid': projectid,
+        'projectName': projectName,
+        'task': task,
+        'tags': tags,
+        'timeElapsed': timeElapsed
+    }
+    result = db.projects.insert_one(new_project)
+    
+    if result.inserted_id:
+        return jsonify({'message': 'Project data added successfully!', 'projectid': projectid}), 201
+    else:
+        return jsonify({'error': 'Failed to add project data.'}), 500
+    
 """
 TimeTracker - Display worked project details
 """
