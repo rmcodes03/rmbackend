@@ -578,6 +578,7 @@ def add_project_data():
 """
 TimeTracker - Display worked project details
 """
+'''
 @app.route('/auth/get_employee_projects', methods=['GET'])
 def get_employee_projects():
     if 'empid' not in session:
@@ -586,6 +587,14 @@ def get_employee_projects():
     empid = session['empid']
     projects = db.projects.find({'empid': empid})
     project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'], 'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
+
+    return jsonify({'projects': project_list}), 200
+'''
+@app.route('/auth/get_employee_projects', methods=['GET'])
+def get_employee_projects():
+    projects = db.projects.find()
+    project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'],
+                     'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
 
     return jsonify({'projects': project_list}), 200
 
