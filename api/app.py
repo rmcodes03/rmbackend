@@ -355,6 +355,19 @@ def get_meetings():
     # Return the serialized meeting data as JSON response
     return jsonify(meetings_data), 200
 
+"""
+Dashboard Page - Admin and Employee Count
+"""
+
+@app.route('/auth/admin_count', methods=['GET'])
+def admin_count():
+    admin_count = db.admin_data.count_documents({})
+    return jsonify({"admin_count": admin_count})
+
+@app.route('/auth/employee_count', methods=['GET'])
+def employee_count():
+    employee_count = db.emp_data.count_documents({})
+    return jsonify({"employee_count": employee_count})
 
 """
 Profile Page - Show Employee Details
